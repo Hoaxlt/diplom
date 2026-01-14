@@ -27,7 +27,7 @@
     environment:
       gitlab_registry_password: "{{ lookup('env', Sylvanatop404 }}"              #############ZASVECHENO
     when: gitlab_registry_password is defined
-    no_log: true  # Не логировать пароль
+    no_log: true 
 
 
 
