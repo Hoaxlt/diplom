@@ -1,0 +1,71 @@
+---
+# tasks file for k8s_helm
+  - name: Download and install script
+    shell: |
+        curl -fsSL -o $HOME/get-helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+        chmod 700 $HOME/get-helm.sh
+        bash $HOME/get-helm.sh
+
+  - name: Create folder $HOME/k8s_nodeport
+    shell: "{{ item }}"
+    become_user: ubuntu
+    with_items:
+      - mkdir $HOME/k8s_nodeport
+
+  - name: Clone svc.yaml the Git repository
+    become_user: ubuntu
+    git:
+      repo: https://github.com/Hoaxlt/k8s_nodeport.git
+      dest: $HOME/k8s_nodeport
+      clone: yes
+
+# tasks/k8s-helm.yml
+
+  - name: Login to GitLab Container Registry
+    shell: |
+      echo Sylvanatop404 | docker login registry.gitlab.com -u hoaxlt --password-stdin
+    environment:
+      gitlab_registry_password: "{{ lookup('env', Sylvanatop404 }}"              #############ZASVECHENO
+    when: gitlab_registry_password is defined
+    no_log: true  # Не логировать пароль
+
+
+
+  - name: Add Helm repo & Run update Helm & Create namespace "monitoring" & install prometheus & apply svc.yaml
+    shell: "{{ item }}"
+    become_user: ubuntu
+    with_items:
+      - helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+      - helm repo update
+      - kubectl create namespace monitoring
+#      - helm install prometheus prometheus-community/kube-prometheus-stack -n monitoring
+#      - helm install [RELEASE_NAME] oci://ghcr.io/prometheus-community/charts/kube-prometheus-stack
+      - kubectl apply -f $HOME/k8s_nodeport/svc.yaml
+
+
+
+
+  - name: Check Kubernetes cluster status
+    shell: |
+      kubectl get nodes
+      kubectl get pods -A
+    register: k8s_status
+    become_user: ubuntu
+
+  - name: Add Helm repo
+    shell: |
+      helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+      helm repo update
+    become_user: ubuntu
+
+ 
+  - name: Pull docker container
+    shell: "{{ item }}"
+    with_items:
+      - docker pull hoaxlt/diplom-nginx:v3
+
+  - name: Apply deployment.yaml
+    shell: "{{ item }}"
+    become_user: ubuntu
+    with_items:
+      - kubectl apply -f $HOME/k8s_nodeport/deployment.yaml

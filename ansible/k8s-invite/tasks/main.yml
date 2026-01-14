@@ -1,0 +1,27 @@
+
+---
+- name: Clean workers
+  become: yes
+  shell: |
+    kubeadm reset -f
+    rm -rf /etc/kubernetes /var/lib/kubelet ~/.kube
+  when: inventory_hostname in groups['worker']
+  ignore_errors: yes
+
+- name: Get join command
+  become: yes
+  shell: kubeadm token create --print-join-command
+  register: join_cmd
+  delegate_to: "{{ groups['master'][0] }}"
+  run_once: yes
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+
+- name: Join cluster
+  become: yes
+  shell: "{{ join_cmd.stdout }} --ignore-preflight-errors=all"
+  when: inventory_hostname in groups['worker']
+  register: join_result
+  changed_when: join_result.rc == 0
+  async: 300
+  poll: 10

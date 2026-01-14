@@ -1,0 +1,36 @@
+---
+- name: install docker and kubectl
+  hosts: [master, worker] 
+  become: yes
+  remote_user: ubuntu
+  roles:
+  - docker-install
+  - k8s-install
+
+- name: create cluster
+  hosts: master
+  become: yes
+  remote_user: ubuntu
+  roles:
+  - k8s
+
+- name: node invite
+  hosts: worker
+  become: yes
+  remote_user: ubuntu
+  roles:
+  - k8s-invite
+
+- name: install helm
+  hosts: master
+  become: yes
+  remote_user: ubuntu
+  roles:
+  - k8s-helm
+
+- name: setting up gitlab
+  hosts: master
+  become: yes
+  remote_user: ubuntu
+  roles:
+  - gitlab
