@@ -19,16 +19,6 @@
       dest: $HOME/k8s_nodeport
       clone: yes
 
-# tasks/k8s-helm.yml
-
-  # - name: Login to GitLab Container Registry
-  #   shell: |
-  #     echo Sylvanatop404 | docker login registry.gitlab.com -u hoaxlt --password-stdin
-  #   environment:
-  #     gitlab_registry_password: "{{ lookup('env', Sylvanatop404 }}"              #############ZASVECHENO
-  #   when: gitlab_registry_password is defined
-  #   no_log: true 
-
 
 
   - name: Add Helm repo & Run update Helm & Create namespace "monitoring" & install prometheus & apply svc.yaml
