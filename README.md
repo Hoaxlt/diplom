@@ -178,7 +178,7 @@ terraform init -backend-config="access_key=$ACCESS_KEY" -backend-config="secret_
 
 проверим что создались все нужные тачки:
 
-![](https://github.com/Hoaxlt/diplom/blob/main/IMAGE%202026-01-15%2003%3A31%3A42.jpg)
+![](https://github.com/Hoaxlt/diplom/blob/main/IMAGE%202026-01-15%2003%3A31%3A43.jpg)
 
 Конфигурируем наши будущие ноды:
 запускаем подготовленный плейбук 
